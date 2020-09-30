@@ -1,11 +1,12 @@
 import React from "react";
+import ContentHeader from "../../components/ContentHeader";
+import { Container } from "./styles";
 
 const Dashboard: React.FC = () => {
   return (
-    <div>
-      <h1>Lindsay</h1>
-      <h2>Dashboard</h2>
-    </div>
+    <Container>
+      <ContentHeader />
+    </Container>
   );
 };
 
