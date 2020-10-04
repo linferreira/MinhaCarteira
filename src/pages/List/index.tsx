@@ -1,8 +1,11 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 
 import ContentHeader from "../../components/ContentHeader";
 import HistoryFinanceCard from "../../components/HistoryFinanceCard";
 import SelectInput from "../../components/SelectInput";
+
+import gains from "../../repositories/gains";
+import expenses from "../../repositories/expenses";
 
 import { Container, Content, Filter } from "./styles";
 
@@ -14,13 +17,27 @@ interface IRouteParams {
   };
 }
 
+interface IData {
+  id: string;
+  description: string;
+  amountFormatted: string;
+  frequency: string;
+  dataFormatted: string;
+  tagColor: string;
+}
+
 const List: React.FC<IRouteParams> = ({ match }) => {
+  const [data, setData] = useState<IData[]>([]);
   const { type } = match.params;
 
   const items = useMemo(() => {
     return type === "entry-balance"
       ? { title: "Entradas", lineColor: "#f7931b" }
       : { title: "Saídas", lineColor: "#e44c4e" };
+  }, [type]);
+
+  const listData = useMemo(() => {
+    return type === "entry-balance" ? gains : expenses;
   }, [type]);
 
   const months = [
@@ -53,6 +70,21 @@ const List: React.FC<IRouteParams> = ({ match }) => {
     },
   ];
 
+  useEffect(() => {
+    const resp = listData.map((item) => {
+      return {
+        id: String(Math.random() * data.length),
+        description: item.description,
+        amountFormatted: item.amount,
+        frequency: item.frequency,
+        dataFormatted: item.date,
+        tagColor: "#4e41f0",
+      };
+    });
+
+    setData(resp);
+  }, []);
+
   return (
     <Container>
       <ContentHeader title={items.title} lineColor={items.lineColor}>
@@ -66,12 +98,15 @@ const List: React.FC<IRouteParams> = ({ match }) => {
       </Filter>
 
       <Content>
-        <HistoryFinanceCard
-          tagColor="#e44c4e"
-          title="Conta de Luz"
-          subtitle="03/10/2020"
-          amount="R$ 125,50"
-        />
+        {data.map((item) => (
+          <HistoryFinanceCard
+            key={item.id}
+            tagColor={item.frequency === "recorrente" ? "#4e41f0" : "#e44c4e"}
+            title={item.description}
+            subtitle={item.dataFormatted}
+            amount={item.amountFormatted}
+          />
+        ))}
       </Content>
     </Container>
   );
