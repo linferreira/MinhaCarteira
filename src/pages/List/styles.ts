@@ -30,7 +30,7 @@ export const Filter = styled.div`
     width: 55px;
     display: block;
     margin: 0 auto;
-    border-bottom: 10px solid ${(props) => props.theme.colors.warning};
+    border-bottom: 10px solid ${(props) => props.theme.colors.success};
   }
 
   .tag-filter-eventual::after {
@@ -38,6 +38,6 @@ export const Filter = styled.div`
     width: 55px;
     display: block;
     margin: 0 auto;
-    border-bottom: 10px solid ${(props) => props.theme.colors.success};
+    border-bottom: 10px solid ${(props) => props.theme.colors.warning};
   }
 `;
