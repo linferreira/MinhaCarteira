@@ -27,7 +27,7 @@ interface IData {
   description: string;
   amountFormatted: string;
   frequency: string;
-  dataFormatted: string;
+  dateFormatted: string;
   tagColor: string;
 }
 
@@ -38,11 +38,11 @@ const List: React.FC<IRouteParams> = ({ match }) => {
     "eventual",
   ]);
 
-  const [monthSelected, setMonthSelected] = useState<string>(
-    String(new Date().getMonth() + 1)
+  const [monthSelected, setMonthSelected] = useState<number>(
+    new Date().getMonth() + 1
   );
-  const [yearSelected, setYearSelected] = useState<string>(
-    String(new Date().getFullYear())
+  const [yearSelected, setYearSelected] = useState<number>(
+    new Date().getFullYear()
   );
 
   const { type } = match.params;
@@ -59,14 +59,37 @@ const List: React.FC<IRouteParams> = ({ match }) => {
       setFrequencySelected((prev) => [...prev, frequency]);
     }
   };
-  const items = useMemo(() => {
-    return type === "entry-balance"
-      ? { title: "Entradas", lineColor: "#f7931b" }
-      : { title: "Saídas", lineColor: "#e44c4e" };
-  }, [type]);
 
-  const listDate = useMemo(() => {
-    return type === "entry-balance" ? gains : expenses;
+  const handleMonthSelected = (month: string) => {
+    try {
+      const parseMonth = Number(month);
+      setMonthSelected(parseMonth);
+    } catch {
+      throw new Error("invalid month value. Is accept 0 - 24.");
+    }
+  };
+
+  const handleYearSelected = (year: string) => {
+    try {
+      const parseYear = Number(year);
+      setYearSelected(parseYear);
+    } catch {
+      throw new Error("invalid year value. Is accept integer numbers.");
+    }
+  };
+
+  const pageData = useMemo(() => {
+    return type === "entry-balance"
+      ? {
+          title: "Entradas",
+          lineColor: "#f7931b",
+          data: gains,
+        }
+      : {
+          title: "Saídas",
+          lineColor: "#e44c4e",
+          data: expenses,
+        };
   }, [type]);
 
   const months = useMemo(() => {
@@ -81,7 +104,7 @@ const List: React.FC<IRouteParams> = ({ match }) => {
   const years = useMemo(() => {
     let uniqueYears: number[] = [];
 
-    listDate.forEach((item) => {
+    pageData.data.forEach((item) => {
       const date = new Date(item.date);
       const year = date.getFullYear();
 
@@ -96,13 +119,13 @@ const List: React.FC<IRouteParams> = ({ match }) => {
         label: year,
       };
     });
-  }, [listDate]);
+  }, [pageData]);
 
   useEffect(() => {
-    const filteredDate = listDate.filter((item) => {
+    const filteredDate = pageData.data.filter((item) => {
       const date = new Date(item.date);
-      const month = String(date.getMonth() + 1);
-      const year = String(date.getFullYear());
+      const month = date.getMonth() + 1;
+      const year = date.getFullYear();
 
       return (
         month === monthSelected &&
@@ -117,24 +140,24 @@ const List: React.FC<IRouteParams> = ({ match }) => {
         description: item.description,
         amountFormatted: formatCurrency(Number(item.amount)),
         frequency: item.frequency,
-        dataFormatted: formatDate(item.date),
+        dateFormatted: formatDate(item.date),
         tagColor: "#4e41f0",
       };
     });
 
     setData(formattedDate);
-  }, [listDate, monthSelected, yearSelected, frequencySelected]);
+  }, [pageData, monthSelected, yearSelected, frequencySelected]);
 
   return (
     <Container>
-      <ContentHeader title={items.title} lineColor={items.lineColor}>
+      <ContentHeader title={pageData.title} lineColor={pageData.lineColor}>
         <SelectInput
-          onChange={(e) => setMonthSelected(e.target.value)}
+          onChange={(e) => handleMonthSelected(e.target.value)}
           options={months}
           defaultValue={monthSelected}
         />
         <SelectInput
-          onChange={(e) => setYearSelected(e.target.value)}
+          onChange={(e) => handleYearSelected(e.target.value)}
           options={years}
           defaultValue={yearSelected}
         />
@@ -169,7 +192,7 @@ const List: React.FC<IRouteParams> = ({ match }) => {
             key={item.id}
             tagColor={item.frequency === "recorrente" ? "#4e41f0" : "#e44c4e"}
             title={item.description}
-            subtitle={item.dataFormatted}
+            subtitle={item.dateFormatted}
             amount={item.amountFormatted}
           />
         ))}
