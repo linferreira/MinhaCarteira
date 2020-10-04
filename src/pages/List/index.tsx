@@ -1,4 +1,5 @@
 import React, { useMemo, useState, useEffect } from "react";
+import { uuid } from "uuidv4";
 
 import ContentHeader from "../../components/ContentHeader";
 import HistoryFinanceCard from "../../components/HistoryFinanceCard";
@@ -9,6 +10,7 @@ import expenses from "../../repositories/expenses";
 
 import formatCurrency from "../../utils/fotmatCurrency";
 import formatDate from "../../utils/formatDate";
+import listOfMounths from "../../utils/mounths";
 
 import { Container, Content, Filter } from "./styles";
 
@@ -46,46 +48,41 @@ const List: React.FC<IRouteParams> = ({ match }) => {
       : { title: "Saídas", lineColor: "#e44c4e" };
   }, [type]);
 
-  const listData = useMemo(() => {
+  const listDate = useMemo(() => {
     return type === "entry-balance" ? gains : expenses;
   }, [type]);
 
-  const months = [
-    {
-      value: 1,
-      label: "Janeiro",
-    },
-    {
-      value: 5,
-      label: "Maio",
-    },
-    {
-      value: 7,
-      label: "Julho",
-    },
-    {
-      value: 10,
-      label: "Outubro",
-    },
-  ];
+  const months = useMemo(() => {
+    return listOfMounths.map((month, index) => {
+      return {
+        value: index + 1,
+        label: month,
+      };
+    });
+  }, []);
 
-  const years = [
-    {
-      value: 2018,
-      label: 2018,
-    },
-    {
-      value: 2019,
-      label: 2019,
-    },
-    {
-      value: 2020,
-      label: 2020,
-    },
-  ];
+  const years = useMemo(() => {
+    let uniqueYears: number[] = [];
+
+    listDate.forEach((item) => {
+      const date = new Date(item.date);
+      const year = date.getFullYear();
+
+      if (!uniqueYears.includes(year)) {
+        uniqueYears.push(year);
+      }
+    });
+
+    return uniqueYears.map((year) => {
+      return {
+        value: year,
+        label: year,
+      };
+    });
+  }, [listDate]);
 
   useEffect(() => {
-    const filteredDate = listData.filter((item) => {
+    const filteredDate = listDate.filter((item) => {
       const date = new Date(item.date);
       const month = String(date.getMonth() + 1);
       const year = String(date.getFullYear());
@@ -95,7 +92,7 @@ const List: React.FC<IRouteParams> = ({ match }) => {
 
     const formattedDate = filteredDate.map((item) => {
       return {
-        id: String(new Date().getTime()),
+        id: uuid(),
         description: item.description,
         amountFormatted: formatCurrency(Number(item.amount)),
         frequency: item.frequency,
@@ -105,7 +102,7 @@ const List: React.FC<IRouteParams> = ({ match }) => {
     });
 
     setData(formattedDate);
-  }, [listData, monthSelected, yearSelected]);
+  }, [listDate, monthSelected, yearSelected]);
 
   return (
     <Container>
