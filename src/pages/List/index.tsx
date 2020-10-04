@@ -31,6 +31,13 @@ interface IData {
 
 const List: React.FC<IRouteParams> = ({ match }) => {
   const [data, setData] = useState<IData[]>([]);
+  const [monthSelected, setMonthSelected] = useState<string>(
+    String(new Date().getMonth() + 1)
+  );
+  const [yearSelected, setYearSelected] = useState<string>(
+    String(new Date().getFullYear())
+  );
+
   const { type } = match.params;
 
   const items = useMemo(() => {
@@ -45,38 +52,50 @@ const List: React.FC<IRouteParams> = ({ match }) => {
 
   const months = [
     {
+      value: 1,
+      label: "Janeiro",
+    },
+    {
+      value: 5,
+      label: "Maio",
+    },
+    {
       value: 7,
       label: "Julho",
     },
     {
-      value: 8,
-      label: "Agosto",
-    },
-    {
-      value: 9,
-      label: "Setembro",
+      value: 10,
+      label: "Outubro",
     },
   ];
 
   const years = [
     {
-      value: 2020,
-      label: 2020,
+      value: 2018,
+      label: 2018,
     },
     {
       value: 2019,
       label: 2019,
     },
     {
-      value: 2018,
-      label: 2018,
+      value: 2020,
+      label: 2020,
     },
   ];
 
   useEffect(() => {
-    const resp = listData.map((item) => {
+    const filteredDate = listData.filter((item) => {
+      const date = new Date(item.date);
+      const month = String(date.getMonth() + 1);
+      const year = String(date.getFullYear());
+
+      return month === monthSelected && year === yearSelected;
+    });
+
+    const formattedDate = filteredDate.map((item) => {
       return {
-        id: String(Math.random() * data.length),
+        id: String(new Date().getTime()),
         description: item.description,
         amountFormatted: formatCurrency(Number(item.amount)),
         frequency: item.frequency,
@@ -85,14 +104,22 @@ const List: React.FC<IRouteParams> = ({ match }) => {
       };
     });
 
-    setData(resp);
-  }, []);
+    setData(formattedDate);
+  }, [listData, monthSelected, yearSelected]);
 
   return (
     <Container>
       <ContentHeader title={items.title} lineColor={items.lineColor}>
-        <SelectInput options={months} />
-        <SelectInput options={years} />
+        <SelectInput
+          onChange={(e) => setMonthSelected(e.target.value)}
+          options={months}
+          defaultValue={monthSelected}
+        />
+        <SelectInput
+          onChange={(e) => setYearSelected(e.target.value)}
+          options={years}
+          defaultValue={yearSelected}
+        />
       </ContentHeader>
 
       <Filter>

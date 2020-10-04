@@ -36,7 +36,7 @@ export const Container = styled.li`
   }
 
   > div span {
-    font-size: 22px;
+    font-size: 18px;
     font-weight: 500;
   }
 `;
