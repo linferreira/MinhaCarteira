@@ -7,6 +7,9 @@ import SelectInput from "../../components/SelectInput";
 import gains from "../../repositories/gains";
 import expenses from "../../repositories/expenses";
 
+import formatCurrency from "../../utils/fotmatCurrency";
+import formatDate from "../../utils/formatDate";
+
 import { Container, Content, Filter } from "./styles";
 
 interface IRouteParams {
@@ -75,9 +78,9 @@ const List: React.FC<IRouteParams> = ({ match }) => {
       return {
         id: String(Math.random() * data.length),
         description: item.description,
-        amountFormatted: item.amount,
+        amountFormatted: formatCurrency(Number(item.amount)),
         frequency: item.frequency,
-        dataFormatted: item.date,
+        dataFormatted: formatDate(item.date),
         tagColor: "#4e41f0",
       };
     });
