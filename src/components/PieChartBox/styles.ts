@@ -67,5 +67,5 @@ export const SideRight = styled.main`
   min-height: 150px;
   display: flex;
   justify-content: center;
-  padding-top: 35px;
+  /* padding-top: 35px; */
 `;
