@@ -140,6 +140,46 @@ const Dashboard: React.FC = () => {
     return data;
   }, [totalGains, totalExpenses]);
 
+  const relationExpensevesRecurrentVersusEventual = useMemo(() => {
+    let amountRecurrent = 0;
+    let amountEventual = 0;
+
+    expenses
+      .filter((expense) => {
+        const date = new Date(expense.date);
+        const year = date.getFullYear();
+        const month = date.getMonth() + 1;
+
+        return month === monthSelected && year === yearSelected;
+      })
+      .forEach((expense) => {
+        if (expense.frequency === "recorrente") {
+          return (amountRecurrent += Number(expense.amount));
+        }
+
+        if (expense.frequency === "eventual") {
+          return (amountEventual += Number(expense.amount));
+        }
+      });
+
+    const total = amountRecurrent + amountEventual;
+
+    return [
+      {
+        name: "Recorrentes",
+        amount: amountRecurrent,
+        percent: Number(((amountRecurrent / total) * 100).toFixed(1)),
+        color: "#4E41F0",
+      },
+      {
+        name: "Eventuais",
+        amount: amountEventual,
+        percent: Number(((amountEventual / total) * 100).toFixed(1)),
+        color: "#e44c4e",
+      },
+    ];
+  }, [monthSelected, yearSelected]);
+
   const historyData = useMemo(() => {
     return listOfMounths
       .map((_, month) => {
