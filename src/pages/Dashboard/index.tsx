@@ -6,6 +6,7 @@ import WalletBox from "../../components/WalletBox";
 import MessageBox from "../../components/MessageBox";
 import PieChartBox from "../../components/PieChartBox";
 import HistoryBox from "../../components/HistoryBox";
+import BarChartBox from "../../components/BarChartBox";
 
 import happyImg from "../../assets/happy.svg";
 import sadImg from "../../assets/sad.svg";
@@ -180,6 +181,46 @@ const Dashboard: React.FC = () => {
     ];
   }, [monthSelected, yearSelected]);
 
+  const relationGainsRecurrentVersusEventual = useMemo(() => {
+    let amountRecurrent = 0;
+    let amountEventual = 0;
+
+    gains
+      .filter((gain) => {
+        const date = new Date(gain.date);
+        const year = date.getFullYear();
+        const month = date.getMonth() + 1;
+
+        return month === monthSelected && year === yearSelected;
+      })
+      .forEach((gain) => {
+        if (gain.frequency === "recorrente") {
+          return (amountRecurrent += Number(gain.amount));
+        }
+
+        if (gain.frequency === "eventual") {
+          return (amountEventual += Number(gain.amount));
+        }
+      });
+
+    const total = amountRecurrent + amountEventual;
+
+    return [
+      {
+        name: "Recorrentes",
+        amount: amountRecurrent,
+        percent: Number(((amountRecurrent / total) * 100).toFixed(1)),
+        color: "#4E41F0",
+      },
+      {
+        name: "Eventuais",
+        amount: amountEventual,
+        percent: Number(((amountEventual / total) * 100).toFixed(1)),
+        color: "#e44c4e",
+      },
+    ];
+  }, [monthSelected, yearSelected]);
+
   const historyData = useMemo(() => {
     return listOfMounths
       .map((_, month) => {
@@ -313,6 +354,16 @@ const Dashboard: React.FC = () => {
           data={historyData}
           lineColorAmountEntry="#f7931b"
           lineColorAmountOutput="#e44c4e"
+        />
+
+        <BarChartBox
+          data={relationExpensevesRecurrentVersusEventual}
+          title="Saídas"
+        />
+
+        <BarChartBox
+          data={relationGainsRecurrentVersusEventual}
+          title="Entradas"
         />
       </Content>
     </Container>
