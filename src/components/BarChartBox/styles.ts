@@ -15,6 +15,13 @@ export const Container = styled.div`
   color: ${(props) => props.theme.colors.white};
 
   border-radius: 7px;
+
+  @media (max-width: 1200px) {
+    flex-direction: column;
+
+    width: 100%;
+    height: auto;
+  }
 `;
 
 export const LegendContainer = styled.ul`
@@ -32,6 +39,13 @@ export const LegendContainer = styled.ul`
   }
   ::-webkit-scrollbar-track {
     background-color: ${(props) => props.theme.colors.tertiary};
+  }
+
+  @media (max-width: 1200px) {
+    display: flex;
+    padding: 0;
+
+    height: auto;
   }
 `;
 
