@@ -1,10 +1,18 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import Dashboard from "./Pages/Dashboard/index";
+
+import { ThemeProvider } from "./hooks/themes";
+import { AuthProvider } from "./hooks/auth";
+
+import App from "./App";
 
 ReactDOM.render(
   <React.StrictMode>
-    <Dashboard />
+    <ThemeProvider>
+      <AuthProvider>
+        <App />
+      </AuthProvider>
+    </ThemeProvider>
   </React.StrictMode>,
   document.getElementById("root")
 );
