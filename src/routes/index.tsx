@@ -9,6 +9,10 @@ import Auth from "./auth.routes";
 const Routes: React.FC = () => {
   const { logged } = useAuth();
 
-  return <BrowserRouter>{logged ? <App /> : <Auth />}</BrowserRouter>;
+  return (
+    <BrowserRouter basename={process.env.PUBLIC_URL}>
+      {logged ? <App /> : <Auth />}
+    </BrowserRouter>
+  )
 };
 export default Routes;
